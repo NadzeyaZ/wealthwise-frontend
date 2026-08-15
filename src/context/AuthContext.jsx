@@ -25,11 +25,12 @@ export function AuthProvider({ children }) {
 
     if (!response.ok) {
       setUser(null);
-      return;
+      return null;
     }
 
     const userData = await response.json();
     setUser(userData);
+    return userData;
   };
 
   const register = async (credentials) => {
@@ -41,7 +42,7 @@ export function AuthProvider({ children }) {
     const result = await response.text();
     if (!response.ok) throw Error(result);
     setToken(result);
-    await loadCurrentUser(result);
+    return await loadCurrentUser(result);
   };
 
   const login = async (credentials) => {
@@ -53,7 +54,7 @@ export function AuthProvider({ children }) {
     const result = await response.text();
     if (!response.ok) throw Error(result);
     setToken(result);
-    await loadCurrentUser(result);
+    return await loadCurrentUser(result);
   };
 
   const logout = () => {

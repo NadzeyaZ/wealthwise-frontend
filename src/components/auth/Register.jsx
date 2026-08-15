@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 
 import { useAuth } from "../../context/AuthContext";
@@ -6,10 +6,18 @@ import FormInput from "../FormInput";
 
 /** A form that allows users to register for a new account */
 export default function Register() {
-  const { register } = useAuth();
+  const { register, user } = useAuth();
   const navigate = useNavigate();
 
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (user?.role === "advisor") {
+      navigate(`/advisor/${user.id}`);
+    } else if (user) {
+      navigate(`/client/${user.id}`);
+    }
+  }, [user, navigate]);
 
   const onRegister = async (formData) => {
     const firstName = formData.get("firstName");
