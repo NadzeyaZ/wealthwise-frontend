@@ -6,7 +6,7 @@ export default function Layout() {
   return (
     <>
       <Navbar />
-      <main>
+      <main className="flex flex-col items-center justify-center p-4">
         <Outlet />
       </main>
     </>
