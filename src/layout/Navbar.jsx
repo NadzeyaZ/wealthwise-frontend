@@ -1,9 +1,10 @@
 import { NavLink } from "react-router";
 
 import { useAuth } from "../context/AuthContext";
+import AdvisorDashboard from "../components/advisor/AdvisorDashboard";
 
 export default function Navbar() {
-  const { token, logout } = useAuth();
+  const { token, logout, user } = useAuth();
   return (
     <header
       id="navbar"
@@ -23,7 +24,11 @@ export default function Navbar() {
       </NavLink>
       <nav>
         {token ? (
-          <button onClick={logout}>Log out</button>
+          <>
+            <NavLink to="/" onClick={logout}>
+              Log out
+            </NavLink>
+          </>
         ) : (
           <NavLink to="/login">Log in</NavLink>
         )}

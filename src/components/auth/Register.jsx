@@ -12,10 +12,13 @@ export default function Register() {
   const [error, setError] = useState(null);
 
   const onRegister = async (formData) => {
-    const username = formData.get("username");
+    const firstName = formData.get("firstName");
+    const lastName = formData.get("lastName");
+    const email = formData.get("email");
     const password = formData.get("password");
+    const role = formData.get("accountType");
     try {
-      await register({ username, password });
+      await register({ email, password, firstName, lastName, role });
       navigate("/");
     } catch (e) {
       setError(e.message);
@@ -50,7 +53,8 @@ export default function Register() {
         {error && <output className="text-red-500">{error}</output>}
       </form>
       <Link to="/login" className="text-sm">
-        Already have an account? Log in here.
+        Already have an account?{" "}
+        <p className="text-blue-500 underline">Log in here</p>
       </Link>
     </div>
   );
