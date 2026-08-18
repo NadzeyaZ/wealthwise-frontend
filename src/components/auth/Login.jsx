@@ -15,7 +15,7 @@ export default function Login() {
     if (user?.role === "advisor") {
       navigate(`/advisor/${user.id}`);
     } else if (user) {
-      navigate(`/client/${user.id}`);
+      navigate(`/investments`);
     }
   }, [user, navigate]);
 
