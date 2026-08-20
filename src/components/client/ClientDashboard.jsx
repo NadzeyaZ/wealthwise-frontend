@@ -49,7 +49,7 @@ export default function ClientDashboard() {
   );
 
   const investmentsByAssetClass = investments.reduce((acc, investment) => {
-    const key = investment.asset_class;
+    const key = investment.asset_class.replace(/_/g, " ");
     if (!acc[key]) {
       acc[key] = 0;
     }
@@ -108,7 +108,7 @@ export default function ClientDashboard() {
                   <td>
                     <strong>{investment.name}</strong>
                   </td>
-                  <td>{investment.asset_class}</td>
+                  <td>{investment.asset_class.replace(/_/g, " ")}</td>
                   <td>{investment.quantity}</td>
                   <td>${investment.unit_price}</td>
                 </tr>
