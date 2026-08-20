@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useParams } from "react-router";
 import { AgCharts } from "ag-charts-react";
 import {
   ModuleRegistry,
@@ -13,19 +14,29 @@ const API = import.meta.env.VITE_API;
 
 export default function ClientDashboard() {
   const { user, token } = useAuth();
+  const { clientId } = useParams();
+  const [client, setClient] = useState(null);
   const [investments, setInvestments] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const isAdvisor = user?.role === "advisor";
+
   useEffect(() => {
-    if (!user || user.role !== "client") return;
+    const targetClientId = clientId || user?.id;
+
+    if (!targetClientId) return;
 
     async function loadInvestments() {
+      setLoading(true);
       try {
-        const response = await fetch(`${API}/investments`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const response = await fetch(
+          `${API}/clients/${targetClientId}/investments`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
 
         if (!response.ok) {
           throw new Error("Failed to load investments");
@@ -35,13 +46,41 @@ export default function ClientDashboard() {
         setInvestments(data);
       } catch (error) {
         console.error(error);
+        setInvestments([]);
       } finally {
         setLoading(false);
       }
     }
 
     loadInvestments();
-  }, [user, token]);
+  }, [clientId, user, token]);
+
+  useEffect(() => {
+    async function loadClient() {
+      try {
+        const response = await fetch(`${API}/clients`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to load clients");
+        }
+
+        const clients = await response.json();
+        const foundClient = clients.find(
+          (client) => client.id === parseInt(clientId),
+        );
+        setClient(foundClient || null);
+      } catch (error) {
+        console.error(error);
+        setClient(null);
+      }
+    }
+
+    loadClient();
+  }, [clientId, token]);
 
   const totalValue = investments.reduce(
     (acc, investment) => acc + investment.quantity * investment.unit_price,
@@ -77,7 +116,21 @@ export default function ClientDashboard() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">My portfolio</h1>
+      {isAdvisor && (
+        <button
+          className=" text-blue-500 underline mb-4"
+          onClick={() => window.history.back()}
+        >
+          Back to my clients
+        </button>
+      )}
+      {isAdvisor ? (
+        <h1 className="text-2xl font-bold mb-4">
+          {client?.firstName} {client?.lastName} Dashboard
+        </h1>
+      ) : (
+        <h1 className="text-2xl font-bold mb-4">My portfolio</h1>
+      )}
       {loading ? (
         <p>Loading investments...</p>
       ) : investments.length === 0 ? (
