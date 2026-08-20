@@ -13,9 +13,9 @@ export default function Register() {
 
   useEffect(() => {
     if (user?.role === "advisor") {
-      navigate(`/advisor/${user.id}`);
+      navigate(`/clients`);
     } else if (user) {
-      navigate(`/investments`);
+      navigate(`/clients/${user.id}/investments`);
     }
   }, [user, navigate]);
 
