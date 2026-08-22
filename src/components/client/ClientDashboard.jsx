@@ -215,6 +215,7 @@ export default function ClientDashboard() {
                         <input
                           className="text-center border border-gray-300 rounded px-2 my-1 w-40"
                           type="number"
+                          min="0"
                           value={investment.quantity}
                           onChange={(e) =>
                             handleQuantityChange(investment.id, e.target.value)
