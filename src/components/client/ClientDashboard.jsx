@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import AddInvestment from "../advisor/AddInvestment";
 import { useParams } from "react-router";
 import { AgCharts } from "ag-charts-react";
 import {
@@ -17,7 +18,9 @@ export default function ClientDashboard() {
   const { clientId } = useParams();
   const [client, setClient] = useState(null);
   const [investments, setInvestments] = useState([]);
+  const [investment, setInvestment] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isAddInvestmentOpen, setIsAddInvestmentOpen] = useState(false);
 
   const isAdvisor = user?.role === "advisor";
 
@@ -112,6 +115,45 @@ export default function ClientDashboard() {
     ],
   };
 
+  const handleQuantityChange = (id, newQuantity) => {
+    setInvestments((prev) =>
+      prev.map((inv) =>
+        inv.id === id ? { ...inv, quantity: Number(newQuantity) } : inv,
+      ),
+    );
+    setInvestment(id);
+  };
+
+  useEffect(() => {
+    if (investment !== null) {
+      const updatedInvestment = investments.find(
+        (inv) => inv.id === investment,
+      );
+      if (updatedInvestment) {
+        fetch(`${API}/clients/${clientId}/investments/${investment}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ quantity: updatedInvestment.quantity }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to update investment");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Investment updated:", data);
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
+    }
+  }, [investment, clientId, token, investments]);
+
   if (!user) return <p>Please log in.</p>;
 
   return (
@@ -144,38 +186,105 @@ export default function ClientDashboard() {
             </p>
           </section>
           <section>
-            <p className="bg-gray-300">My goals: </p>
+            {isAdvisor ? (
+              <p className="bg-gray-300">Client's goals: </p>
+            ) : (
+              <p className="bg-gray-300">My goals: </p>
+            )}
           </section>
           <table className="col-span-2">
             <thead className="bg-gray-300">
               <tr>
-                <th>Name</th>
-                <th>Asset Class</th>
-                <th>Quantity</th>
-                <th>Unit Price</th>
+                <th className="text-left">Name</th>
+                <th className="text-left">Asset Class</th>
+                <th className="text-left">Quantity</th>
+                <th className="text-left">Unit Price</th>
               </tr>
             </thead>
-            {investments.map((investment) => (
+            {isAdvisor ? (
               <tbody>
-                <tr key={investment.id}>
-                  <td>
-                    <strong>{investment.name}</strong>
-                  </td>
-                  <td>{investment.asset_class.replace(/_/g, " ")}</td>
-                  <td>{investment.quantity}</td>
-                  <td>${investment.unit_price}</td>
-                </tr>
+                {investments
+                  .filter((inv) => inv.asset_class !== "cash")
+                  .map((investment) => (
+                    <tr key={investment.id}>
+                      <td>
+                        <strong>{investment.name}</strong>
+                      </td>
+                      <td>{investment.asset_class.replace(/_/g, " ")}</td>
+                      <td>
+                        <input
+                          className="text-center border border-gray-300 rounded px-2 my-1 w-40"
+                          type="number"
+                          value={investment.quantity}
+                          onChange={(e) =>
+                            handleQuantityChange(investment.id, e.target.value)
+                          }
+                        />
+                      </td>
+                      <td>${investment.unit_price}</td>
+                    </tr>
+                  ))}
               </tbody>
-            ))}
+            ) : (
+              <tbody>
+                {investments
+                  .filter((inv) => inv.asset_class !== "cash")
+                  .map((investment) => (
+                    <tr key={investment.id}>
+                      <td>
+                        <strong>{investment.name}</strong>
+                      </td>
+                      <td>{investment.asset_class.replace(/_/g, " ")}</td>
+                      <td>{investment.quantity}</td>
+                      <td>${investment.unit_price}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            )}
           </table>
+          {isAdvisor && (
+            <section className="col-span-2">
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={() => setIsAddInvestmentOpen(true)}
+              >
+                Add Investment
+              </button>
+            </section>
+          )}
+          <section className="col-span-2">
+            <p className="bg-gray-300">Cash: </p>
+            <p className="text-blue-900 text-xl font-bold ">
+              $
+              {investments
+                .filter((inv) => inv.asset_class === "cash")
+                .reduce(
+                  (acc, investment) =>
+                    acc + investment.quantity * investment.unit_price,
+                  0,
+                )
+                .toFixed(2)}
+            </p>
+          </section>
           <section className="col-span-2">
             <p className="bg-gray-300">Chart: </p>
             <AgCharts options={options} />
           </section>
           <section className="col-span-2">
-            <p className="bg-gray-300">Recommendations from my advisor: </p>
+            {isAdvisor ? (
+              <p>Recommendations:</p>
+            ) : (
+              <p className="bg-gray-300">Recommendations from advisor: </p>
+            )}
           </section>
         </div>
+      )}
+      {isAdvisor && isAddInvestmentOpen && (
+        <AddInvestment
+          setIsAddInvestmentOpen={setIsAddInvestmentOpen}
+          clientId={clientId}
+          setInvestments={setInvestments}
+        />
       )}
     </div>
   );
