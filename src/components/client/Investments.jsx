@@ -3,7 +3,7 @@ export default function Investments({ isAdvisor, handleQuantityChange }) {
   const { investments } = useClients();
 
   return (
-    <table className="col-span-2">
+    <table className="w-full space-y-4">
       <thead className="bg-gray-300">
         <tr>
           <th className="text-left">Name</th>

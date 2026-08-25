@@ -3,7 +3,7 @@ import { useClients } from "../../context/ClientsContext";
 export default function Cash() {
   const { investments } = useClients();
   return (
-    <section className="col-span-2">
+    <section>
       <p className="bg-gray-300">Cash: </p>
       <p className="text-blue-900 text-xl font-bold ">
         $

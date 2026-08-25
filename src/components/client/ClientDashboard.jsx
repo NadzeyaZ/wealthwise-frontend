@@ -3,7 +3,7 @@ import Goals from "./Goals";
 import Investments from "./Investments";
 import Cash from "./Cash";
 import { useClients } from "../../context/ClientsContext";
-import AddInvestment from "../advisor/AddInvestment";
+import AddInvestmentForm from "../advisor/AddInvestmentForm";
 import { useParams } from "react-router";
 import { AgCharts } from "ag-charts-react";
 import {
@@ -103,22 +103,24 @@ export default function ClientDashboard() {
             </p>
           </section>
           <Goals />
-          <Investments
-            isAdvisor={isAdvisor}
-            handleQuantityChange={handleQuantityChange}
-          />
-          {isAdvisor && (
-            <section className="col-span-2">
-              <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                onClick={() => setIsAddInvestmentOpen(true)}
-              >
-                Add Investment
-              </button>
-            </section>
-          )}
-          <Cash />
-          <section className="col-span-2">
+          <div className="col-span-1 space-y-4">
+            <Investments
+              isAdvisor={isAdvisor}
+              handleQuantityChange={handleQuantityChange}
+            />
+            {isAdvisor && (
+              <section className="col-span-1">
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  onClick={() => setIsAddInvestmentOpen(true)}
+                >
+                  Add Investment
+                </button>
+              </section>
+            )}
+            <Cash />
+          </div>
+          <section className="col-span-1">
             <p className="bg-gray-300">Chart: </p>
             <AgCharts options={options} />
           </section>
@@ -132,7 +134,7 @@ export default function ClientDashboard() {
         </div>
       )}
       {isAdvisor && isAddInvestmentOpen && (
-        <AddInvestment
+        <AddInvestmentForm
           setIsAddInvestmentOpen={setIsAddInvestmentOpen}
           clientId={clientId}
           setInvestments={setInvestments}
