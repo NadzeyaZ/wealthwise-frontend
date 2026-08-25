@@ -28,9 +28,11 @@ export default function ClientDashboard() {
     setIsAddInvestmentOpen,
     goals,
     setGoals,
+    advisors,
   } = useClients();
 
   const isAdvisor = user?.role === "advisor";
+  const isClient = user?.role === "client";
 
   const totalValue = investments.reduce(
     (acc, investment) => acc + investment.quantity * investment.unit_price,
@@ -84,9 +86,11 @@ export default function ClientDashboard() {
         </button>
       )}
       {isAdvisor ? (
-        <h1 className="text-2xl font-bold mb-4">
-          {client?.firstName} {client?.lastName} Dashboard
-        </h1>
+        <>
+          <h1 className="text-2xl font-bold mb-4">
+            {client?.firstName} {client?.lastName} Dashboard
+          </h1>
+        </>
       ) : (
         <h1 className="text-2xl font-bold mb-4">My portfolio</h1>
       )}

@@ -2,12 +2,34 @@ import { useClients } from "../../context/ClientsContext";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import NewGoalForm from "./NewGoalForm";
+const API = import.meta.env.VITE_API;
 
 export default function Goals({ isAdvisor }) {
-  const { user } = useAuth();
-  const { goals } = useClients();
+  const { token, user } = useAuth();
+  const { goals, setGoals } = useClients();
   const [isAddGoal, setIsAddGoal] = useState(false);
   const isClient = user?.role === "client";
+
+  const onDeleteGoal = async (goalId) => {
+    try {
+      const response = await fetch(`${API}/goals/${goalId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        const message = await response.text();
+        throw new Error(message || "Failed to delete goal");
+      }
+
+      setGoals((currentGoals) =>
+        currentGoals.filter((goal) => goal.id !== goalId),
+      );
+    } catch (error) {
+      console.error("Failed to delete goal:", error);
+    }
+  };
   return (
     <div>
       <section>
@@ -18,6 +40,7 @@ export default function Goals({ isAdvisor }) {
                 <th className="text-left">Goal</th>
                 <th className="text-left">Target Amount</th>
                 <th className="text-left">Target Date</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -26,6 +49,16 @@ export default function Goals({ isAdvisor }) {
                   <td>{goal.name}</td>
                   <td>${goal.target_amount}</td>
                   <td>{new Date(goal.target_date).toLocaleDateString()}</td>
+                  {isClient && (
+                    <td>
+                      <button
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold my-1 mx-2 px-1 py-1 rounded"
+                        onClick={() => onDeleteGoal(goal.id)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

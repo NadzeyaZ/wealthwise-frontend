@@ -15,6 +15,7 @@ export function ClientProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [isAddInvestmentOpen, setIsAddInvestmentOpen] = useState(false);
   const [goals, setGoals] = useState([]);
+  const [advisors, setAdvisors] = useState([]);
 
   useEffect(() => {
     if (user?.role !== "advisor" || !clientId || !token) {
@@ -47,6 +48,40 @@ export function ClientProvider({ children }) {
 
     loadClient();
   }, [clientId, token, user?.role]);
+
+  useEffect(() => {
+    const targetClientId = clientId || user?.id;
+
+    if (!targetClientId || !token) {
+      setAdvisors([]);
+      return;
+    }
+
+    async function loadAdvisors() {
+      try {
+        const response = await fetch(
+          `${API}/clients/${targetClientId}/advisor`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to load advisors");
+        }
+
+        const data = await response.json();
+        setAdvisors(data);
+      } catch (error) {
+        console.error(error);
+        setAdvisors([]);
+      }
+    }
+
+    loadAdvisors();
+  }, [clientId, token, user?.id]);
 
   useEffect(() => {
     const targetClientId = clientId || user?.id;
@@ -152,6 +187,7 @@ export function ClientProvider({ children }) {
     setIsAddInvestmentOpen,
     goals,
     setGoals,
+    advisors,
     loadInvestments,
   };
   return (
