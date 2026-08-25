@@ -3,7 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 
 const API = import.meta.env.VITE_API;
 
-export default function AddInvestment({
+export default function AddInvestmentForm({
   clientId,
   setIsAddInvestmentOpen,
   setInvestments,

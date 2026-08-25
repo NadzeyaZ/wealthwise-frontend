@@ -1,10 +1,12 @@
 import { NavLink } from "react-router";
 
 import { useAuth } from "../context/AuthContext";
+import { useClients } from "../context/ClientsContext";
 import { getAge } from "../utils/date";
 
 export default function Navbar() {
   const { token, logout, user } = useAuth();
+  const { advisors } = useClients();
 
   const userAge = user ? getAge(user.dob) : null;
 
@@ -29,10 +31,17 @@ export default function Navbar() {
         {token ? (
           user ? (
             <div className="flex flex-row justify-start items-center space-x-4">
-              <p>
-                {user.firstName} {user.lastName} ({user.role})
-                {userAge !== null ? `, Age ${userAge}` : ""}
-              </p>
+              <div>
+                <p>
+                  {user.firstName} {user.lastName} ({user.role})
+                  {userAge !== null ? `, Age ${userAge}` : ""}
+                </p>
+                {advisors && advisors.length > 0 && (
+                  <p className="text-sm text-gray-600 mb-4">
+                    Advisor: {advisors[0].firstName} {advisors[0].lastName}
+                  </p>
+                )}
+              </div>
               <NavLink to="/" onClick={logout}>
                 Log out
               </NavLink>

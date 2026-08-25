@@ -4,7 +4,7 @@ import Login from "./components/auth/Login";
 import Register from "./components/auth/Register";
 import AdvisorDashboard from "./components/advisor/AdvisorDashboard";
 import ClientDashboard from "./components/client/ClientDashboard";
-import { useAuth } from "./context/AuthContext";
+import { ClientProvider } from "./context/ClientsContext";
 
 export default function App() {
   return (
@@ -14,7 +14,11 @@ export default function App() {
         <Route path="/clients" element={<AdvisorDashboard />} />
         <Route
           path="/clients/:clientId/investments"
-          element={<ClientDashboard />}
+          element={
+            <ClientProvider>
+              <ClientDashboard />
+            </ClientProvider>
+          }
         />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
