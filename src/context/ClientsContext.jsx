@@ -16,6 +16,7 @@ export function ClientProvider({ children }) {
   const [isAddInvestmentOpen, setIsAddInvestmentOpen] = useState(false);
   const [goals, setGoals] = useState([]);
   const [advisors, setAdvisors] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
 
   useEffect(() => {
     if (user?.role !== "advisor" || !clientId || !token) {
@@ -189,6 +190,8 @@ export function ClientProvider({ children }) {
     setGoals,
     advisors,
     loadInvestments,
+    recommendations,
+    setRecommendations,
   };
   return (
     <ClientsContext.Provider value={value}>{children}</ClientsContext.Provider>

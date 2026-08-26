@@ -1,6 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
 import Goals from "./Goals";
 import Investments from "./Investments";
+import Recommendations from "./Recommendations";
 import Cash from "./Cash";
 import { useClients } from "../../context/ClientsContext";
 import AddInvestmentForm from "../advisor/AddInvestmentForm";
@@ -123,17 +124,11 @@ export default function ClientDashboard() {
               </section>
             )}
             <Cash />
+            <Recommendations />
           </div>
           <section className="col-span-1">
             <p className="bg-gray-300">Chart: </p>
             <AgCharts options={options} />
-          </section>
-          <section className="col-span-2">
-            {isAdvisor ? (
-              <p>Recommendations:</p>
-            ) : (
-              <p className="bg-gray-300">Recommendations from advisor: </p>
-            )}
           </section>
         </div>
       )}
