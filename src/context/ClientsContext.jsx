@@ -16,6 +16,7 @@ export function ClientProvider({ children }) {
   const [isAddInvestmentOpen, setIsAddInvestmentOpen] = useState(false);
   const [goals, setGoals] = useState([]);
   const [advisors, setAdvisors] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
 
   useEffect(() => {
     if (user?.role !== "advisor" || !clientId || !token) {
@@ -149,6 +150,40 @@ export function ClientProvider({ children }) {
     loadGoals();
   }, [clientId, user?.id, token]);
 
+  useEffect(() => {
+    const targetClientId = clientId || user?.id;
+
+    if (!targetClientId || !token) {
+      setRecommendations([]);
+      return;
+    }
+
+    loadRecommendations(targetClientId);
+  }, [clientId, user?.id, token]);
+
+  const loadRecommendations = async (targetClientId) => {
+    try {
+      const response = await fetch(
+        `${API}/recommendations?clientId=${targetClientId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to load recommendations");
+      }
+
+      const data = await response.json();
+      setRecommendations(data);
+    } catch (error) {
+      console.error(error);
+      setRecommendations([]);
+    }
+  };
+
   const loadInvestments = async (targetClientId) => {
     setLoading(true);
     try {
@@ -189,6 +224,9 @@ export function ClientProvider({ children }) {
     setGoals,
     advisors,
     loadInvestments,
+    recommendations,
+    setRecommendations,
+    loadRecommendations,
   };
   return (
     <ClientsContext.Provider value={value}>{children}</ClientsContext.Provider>
