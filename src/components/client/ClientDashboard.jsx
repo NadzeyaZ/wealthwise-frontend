@@ -124,12 +124,12 @@ export default function ClientDashboard() {
               </section>
             )}
             <Cash />
-            <Recommendations />
           </div>
           <section className="col-span-1">
             <p className="bg-gray-300">Chart: </p>
             <AgCharts options={options} />
           </section>
+          <Recommendations />
         </div>
       )}
       {isAdvisor && isAddInvestmentOpen && (

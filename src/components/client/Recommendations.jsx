@@ -12,7 +12,7 @@ export default function Recommendations() {
   const isAdvisor = user?.role === "advisor";
   const isClient = user?.role === "client";
   return (
-    <section className="col-span-1">
+    <section className="col-span-2">
       {isAdvisor ? (
         <p className="bg-gray-300">Recommendations:</p>
       ) : (
