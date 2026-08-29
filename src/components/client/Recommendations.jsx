@@ -13,15 +13,6 @@ export default function Recommendations() {
   const isClient = user?.role === "client";
   return (
     <section className="col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-      {isAdvisor ? (
-        <p className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-4">
-          Recommendations:
-        </p>
-      ) : (
-        <p className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-4">
-          Recommendations from advisor
-        </p>
-      )}
       {recommendations.length > 0 ? (
         <table className="w-full border-collapse">
           <thead>
@@ -52,7 +43,18 @@ export default function Recommendations() {
           </tbody>
         </table>
       ) : (
-        isClient && <p className="text-gray-600">Nothing to review.</p>
+        <div>
+          {isAdvisor ? (
+            <p className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-4">
+              Recommendations:
+            </p>
+          ) : (
+            <p className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-4">
+              Recommendations from advisor
+            </p>
+          )}
+          {isClient && <p className="text-gray-600">Nothing to review.</p>}
+        </div>
       )}
       {isAdvisor && <AddRecommendationForm />}
     </section>

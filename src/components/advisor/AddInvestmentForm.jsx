@@ -1,7 +1,6 @@
 import FormInput from "../FormInput";
 import { useAuth } from "../../context/AuthContext";
-
-const API = import.meta.env.VITE_API;
+import { addInvestment } from "../../../api/wealthwise";
 
 export default function AddInvestmentForm({
   clientId,
@@ -15,20 +14,12 @@ export default function AddInvestmentForm({
     const quantity = formData.get("quantity");
     const unit_price = formData.get("unit_price");
     try {
-      const response = await fetch(`${API}/clients/${clientId}/investments`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ name, asset_class, quantity, unit_price }),
+      const newInvestment = await addInvestment(clientId, token, {
+        name,
+        asset_class,
+        quantity,
+        unit_price,
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to add investment");
-      }
-
-      const newInvestment = await response.json();
       setInvestments((prevInvestments) => [...prevInvestments, newInvestment]);
       setIsAddInvestmentOpen(false);
     } catch (error) {

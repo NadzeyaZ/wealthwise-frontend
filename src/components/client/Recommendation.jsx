@@ -1,5 +1,9 @@
 import { useAuth } from "../../context/AuthContext";
 import { useClients } from "../../context/ClientsContext";
+import {
+  deleteRecommendation,
+  updateRecommendationStatus,
+} from "../../../api/wealthwise";
 
 export default function Recommendation({ rec, isAdvisor, isClient }) {
   const { token } = useAuth();
@@ -7,23 +11,11 @@ export default function Recommendation({ rec, isAdvisor, isClient }) {
 
   const onAcceptRec = async (recId) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API}/recommendations/${recId}/status`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status: "accepted" }),
-        },
+      const updatedRec = await updateRecommendationStatus(
+        recId,
+        token,
+        "accepted",
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to accept recommendation");
-      }
-
-      const updatedRec = await response.json();
       const updatedRecommendations = recommendations.map((rec) =>
         rec.id === recId ? { ...rec, ...updatedRec } : rec,
       );
@@ -35,23 +27,11 @@ export default function Recommendation({ rec, isAdvisor, isClient }) {
 
   const onRejectRec = async (recId) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API}/recommendations/${recId}/status`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status: "rejected" }),
-        },
+      const updatedRec = await updateRecommendationStatus(
+        recId,
+        token,
+        "rejected",
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to reject recommendation");
-      }
-
-      const updatedRec = await response.json();
       const updatedRecommendations = recommendations.map((rec) =>
         rec.id === recId ? { ...rec, ...updatedRec } : rec,
       );
@@ -63,20 +43,7 @@ export default function Recommendation({ rec, isAdvisor, isClient }) {
 
   const onDeleteRec = async (recId) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API}/recommendations/${recId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete recommendation");
-      }
+      await deleteRecommendation(recId, token);
 
       const updatedRecommendations = recommendations.filter(
         (rec) => rec.id !== recId,

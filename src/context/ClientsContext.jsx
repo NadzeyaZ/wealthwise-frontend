@@ -1,8 +1,14 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { useParams } from "react-router";
-
-const API = import.meta.env.VITE_API;
+import {
+  getAdvisorClients,
+  getClientAdvisors,
+  getGoals,
+  getInvestments,
+  getRecommendations,
+  updateInvestment,
+} from "../../api/wealthwise";
 
 const ClientsContext = createContext();
 
@@ -26,17 +32,7 @@ export function ClientProvider({ children }) {
 
     async function loadClient() {
       try {
-        const response = await fetch(`${API}/clients`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to load clients");
-        }
-
-        const clients = await response.json();
+        const clients = await getAdvisorClients(token);
         const foundClient = clients.find(
           (currentClient) => currentClient.id === Number(clientId),
         );
@@ -60,20 +56,7 @@ export function ClientProvider({ children }) {
 
     async function loadAdvisors() {
       try {
-        const response = await fetch(
-          `${API}/clients/${targetClientId}/advisor`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to load advisors");
-        }
-
-        const data = await response.json();
+        const data = await getClientAdvisors(targetClientId, token);
         setAdvisors(data);
       } catch (error) {
         console.error(error);
@@ -96,20 +79,12 @@ export function ClientProvider({ children }) {
         (inv) => inv.id === investment,
       );
       if (updatedInvestment) {
-        fetch(`${API}/clients/${clientId}/investments/${investment}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ quantity: updatedInvestment.quantity }),
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Failed to update investment");
-            }
-            return response.json();
-          })
+        updateInvestment(
+          clientId,
+          investment,
+          token,
+          updatedInvestment.quantity,
+        )
           .then((data) => {
             console.log("Investment updated:", data);
           })
@@ -129,17 +104,7 @@ export function ClientProvider({ children }) {
 
     async function loadGoals() {
       try {
-        const response = await fetch(`${API}/clients/${targetClientId}/goals`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to load goals");
-        }
-
-        const data = await response.json();
+        const data = await getGoals(targetClientId, token);
         setGoals(data);
       } catch (error) {
         console.error(error);
@@ -163,20 +128,7 @@ export function ClientProvider({ children }) {
 
   const loadRecommendations = async (targetClientId) => {
     try {
-      const response = await fetch(
-        `${API}/recommendations?clientId=${targetClientId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to load recommendations");
-      }
-
-      const data = await response.json();
+      const data = await getRecommendations(targetClientId, token);
       setRecommendations(data);
     } catch (error) {
       console.error(error);
@@ -187,20 +139,7 @@ export function ClientProvider({ children }) {
   const loadInvestments = async (targetClientId) => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `${API}/clients/${targetClientId}/investments`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to load investments");
-      }
-
-      const data = await response.json();
+      const data = await getInvestments(targetClientId, token);
       setInvestments(data);
     } catch (error) {
       console.error(error);

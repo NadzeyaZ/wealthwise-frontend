@@ -2,7 +2,7 @@ import FormInput from "../FormInput";
 import { useAuth } from "../../context/AuthContext";
 import { useClients } from "../../context/ClientsContext";
 import { useParams } from "react-router";
-const API = import.meta.env.VITE_API;
+import { addGoal } from "../../../api/wealthwise";
 
 export default function NewGoalForm({ setIsAddGoal }) {
   const { token } = useAuth();
@@ -14,18 +14,12 @@ export default function NewGoalForm({ setIsAddGoal }) {
     const target_amount = formData.get("target_amount");
     const target_date = formData.get("target_date");
     try {
-      const response = await fetch(`${API}/goals`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ clientId, name, target_amount, target_date }),
+      const newGoal = await addGoal(token, {
+        clientId,
+        name,
+        target_amount,
+        target_date,
       });
-      if (!response.ok) {
-        throw new Error("Failed to add goal");
-      }
-      const newGoal = await response.json();
       setGoals((currentGoals) => [...currentGoals, newGoal]);
       setIsAddGoal(false);
     } catch (error) {

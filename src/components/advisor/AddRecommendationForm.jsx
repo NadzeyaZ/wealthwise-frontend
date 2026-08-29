@@ -2,8 +2,7 @@ import FormInput from "../FormInput";
 import { useAuth } from "../../context/AuthContext";
 import { useParams } from "react-router";
 import { useClients } from "../../context/ClientsContext";
-
-const API = import.meta.env.VITE_API;
+import { addRecommendation } from "../../../api/wealthwise";
 
 export default function AddRecommendationForm() {
   const { token, user } = useAuth();
@@ -14,20 +13,11 @@ export default function AddRecommendationForm() {
   const onAddRecommendation = async (formData) => {
     const content = formData.get("content");
     try {
-      const response = await fetch(`${API}/recommendations`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ clientId, advisorId, content }),
+      const newRecommendation = await addRecommendation(token, {
+        clientId,
+        advisorId,
+        content,
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to add recommendation");
-      }
-
-      const newRecommendation = await response.json();
       setRecommendations([...recommendations, newRecommendation]);
       console.log("New recommendation added:", newRecommendation);
     } catch (error) {

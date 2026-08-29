@@ -2,7 +2,7 @@ import { useClients } from "../../context/ClientsContext";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import NewGoalForm from "./NewGoalForm";
-const API = import.meta.env.VITE_API;
+import { deleteGoal } from "../../../api/wealthwise";
 
 export default function Goals({ isAdvisor }) {
   const { token, user } = useAuth();
@@ -12,16 +12,7 @@ export default function Goals({ isAdvisor }) {
 
   const onDeleteGoal = async (goalId) => {
     try {
-      const response = await fetch(`${API}/goals/${goalId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        const message = await response.text();
-        throw new Error(message || "Failed to delete goal");
-      }
+      await deleteGoal(goalId, token);
 
       setGoals((currentGoals) =>
         currentGoals.filter((goal) => goal.id !== goalId),
@@ -32,9 +23,6 @@ export default function Goals({ isAdvisor }) {
   };
   return (
     <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-      <p className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-4">
-        Goals:
-      </p>
       {goals.length > 0 ? (
         <>
           <table className="w-full border-collapse mb-4">
@@ -89,7 +77,12 @@ export default function Goals({ isAdvisor }) {
           </table>
         </>
       ) : (
-        <p className="text-gray-600">No goals set.</p>
+        <div>
+          <p className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-4">
+            Goals:
+          </p>
+          <p className="text-gray-600">No goals set.</p>
+        </div>
       )}
       {isClient && (
         <button

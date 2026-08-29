@@ -1,8 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-
-const API = import.meta.env.VITE_API;
+import { getAdvisorClients } from "../../../api/wealthwise";
 
 export default function AdvisorDashboard() {
   const navigate = useNavigate();
@@ -15,17 +14,7 @@ export default function AdvisorDashboard() {
 
     async function loadClients() {
       try {
-        const response = await fetch(`${API}/clients`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to load clients");
-        }
-
-        const data = await response.json();
+        const data = await getAdvisorClients(token);
         setClients(data);
       } catch (error) {
         console.error(error);

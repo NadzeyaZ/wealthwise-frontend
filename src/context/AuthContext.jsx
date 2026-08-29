@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-
-const API = import.meta.env.VITE_API;
+import { getCurrentUser, loginUser, registerUser } from "../../api/wealthwise";
 
 const AuthContext = createContext();
 
@@ -19,42 +18,26 @@ export function AuthProvider({ children }) {
   }, [token]);
 
   const loadCurrentUser = async (authToken) => {
-    const response = await fetch(API + "/users/me", {
-      headers: { Authorization: `Bearer ${authToken}` },
-    });
-
-    if (!response.ok) {
+    const userData = await getCurrentUser(authToken);
+    if (!userData) {
       setUser(null);
       return null;
     }
 
-    const userData = await response.json();
     setUser(userData);
     return userData;
   };
 
   const register = async (credentials) => {
-    const response = await fetch(API + "/users/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(credentials),
-    });
-    const result = await response.text();
-    if (!response.ok) throw Error(result);
-    setToken(result);
-    return await loadCurrentUser(result);
+    const newToken = await registerUser(credentials);
+    setToken(newToken);
+    return loadCurrentUser(newToken);
   };
 
   const login = async (credentials) => {
-    const response = await fetch(API + "/users/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(credentials),
-    });
-    const result = await response.text();
-    if (!response.ok) throw Error(result);
-    setToken(result);
-    return await loadCurrentUser(result);
+    const newToken = await loginUser(credentials);
+    setToken(newToken);
+    return loadCurrentUser(newToken);
   };
 
   const logout = () => {
