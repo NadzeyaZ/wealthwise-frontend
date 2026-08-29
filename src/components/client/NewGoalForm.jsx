@@ -74,7 +74,7 @@ export default function NewGoalForm({ setIsAddGoal }) {
           />
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-950 hover:bg-blue-900 text-white font-medium py-2 px-4 rounded-lg transition-colors"
           >
             Add Goal
           </button>

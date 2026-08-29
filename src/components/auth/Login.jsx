@@ -30,18 +30,46 @@ export default function Login() {
   };
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold mb-4">Log in to your account</h1>
-      <form action={onLogin} className="flex flex-col gap-2">
-        <FormInput label="Email" name="email" type="email" required />
-        <FormInput label="Password" name="password" type="password" required />
-        <button className="bg-blue-400 text-white p-2 rounded">Login</button>
-        {error && <output className="text-red-500">{error}</output>}
-      </form>
-      <Link to="/register" className="text-sm">
-        Need an account?
-        <p className="text-blue-500 underline">Register here</p>
-      </Link>
+    <div className="min-h-screen flex items-start justify-center bg-gray-50 px-4 py-4">
+      <div className="w-full max-w-md bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Welcome back
+          </h1>
+          <p className="text-gray-600">Log in to your WealthWise account</p>
+        </div>
+        <form action={onLogin} className="space-y-4 mb-6">
+          <FormInput label="Email" name="email" type="email" required />
+          <FormInput
+            label="Password"
+            name="password"
+            type="password"
+            required
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-950 text-white py-3 rounded-lg font-medium hover:bg-blue-900 transition-colors"
+          >
+            Log in
+          </button>
+          {error && (
+            <output className="block text-red-600 bg-red-50 border border-red-200 rounded-lg p-3 text-sm">
+              {error}
+            </output>
+          )}
+        </form>
+        <div className="border-t border-gray-200 pt-6">
+          <p className="text-center text-gray-600 text-sm">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="text-blue-950 font-medium hover:underline"
+            >
+              Register here
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

@@ -31,28 +31,52 @@ export default function Goals({ isAdvisor }) {
     }
   };
   return (
-    <div>
-      <section>
-        {goals.length > 0 ? (
-          <table className="w-full space-y-4">
-            <thead className="bg-gray-300">
-              <tr>
-                <th className="text-left">Goal</th>
-                <th className="text-left">Target Amount</th>
-                <th className="text-left">Target Date</th>
-                <th></th>
+    <section className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <p className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-4">
+        Goals:
+      </p>
+      {goals.length > 0 ? (
+        <>
+          <table className="w-full border-collapse mb-4">
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className="text-left text-xs font-medium uppercase tracking-widest text-gray-500 pb-3 pr-4">
+                  Goal
+                </th>
+                <th className="text-left text-xs font-medium uppercase tracking-widest text-gray-500 pb-3 pr-4">
+                  Target Amount
+                </th>
+                <th className="text-left text-xs font-medium uppercase tracking-widest text-gray-500 pb-3 pr-4">
+                  Target Date
+                </th>
+                {isClient && (
+                  <th className="text-left text-xs font-medium uppercase tracking-widest text-gray-500 pb-3 pr-4">
+                    Action
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody>
               {goals.map((goal) => (
-                <tr key={goal.id}>
-                  <td>{goal.name}</td>
-                  <td>${goal.target_amount}</td>
-                  <td>{new Date(goal.target_date).toLocaleDateString()}</td>
+                <tr
+                  key={goal.id}
+                  className="border-b border-gray-100 hover:bg-gray-50/60 transition-colors"
+                >
+                  <td className="py-4 pr-4">
+                    <strong className="font-medium text-slate-900">
+                      {goal.name}
+                    </strong>
+                  </td>
+                  <td className="py-4 pr-4 text-sm text-gray-600">
+                    ${goal.target_amount}
+                  </td>
+                  <td className="py-4 pr-4 text-sm text-gray-600">
+                    {new Date(goal.target_date).toLocaleDateString()}
+                  </td>
                   {isClient && (
-                    <td>
+                    <td className="py-4 pr-4">
                       <button
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold my-1 mx-2 px-1 py-1 rounded"
+                        className="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-3 py-1.5 rounded transition-colors"
                         onClick={() => onDeleteGoal(goal.id)}
                       >
                         Delete
@@ -63,23 +87,20 @@ export default function Goals({ isAdvisor }) {
               ))}
             </tbody>
           </table>
-        ) : (
-          <section className="space-y-4">
-            <p className="bg-gray-300">Goals: </p>
-            <p>No goals set.</p>
-          </section>
-        )}
-      </section>
+        </>
+      ) : (
+        <p className="text-gray-600">No goals set.</p>
+      )}
       {isClient && (
         <button
           type="button"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-blue-950 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-900 transition-colors mt-4"
           onClick={() => setIsAddGoal(true)}
         >
           Add goal
         </button>
       )}
       {isAddGoal && <NewGoalForm setIsAddGoal={setIsAddGoal} />}
-    </div>
+    </section>
   );
 }

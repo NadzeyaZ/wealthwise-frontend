@@ -10,7 +10,7 @@ export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<p>Home page</p>} />
+        <Route index element={<Login />} />
         <Route path="/clients" element={<AdvisorDashboard />} />
         <Route
           path="/clients/:clientId/investments"

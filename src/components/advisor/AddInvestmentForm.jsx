@@ -91,7 +91,7 @@ export default function AddInvestmentForm({
             </button>
             <button
               type="submit"
-              className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+              className="bg-blue-950 text-white px-4 py-2 rounded hover:bg-blue-900 transition-colors"
             >
               Add
             </button>

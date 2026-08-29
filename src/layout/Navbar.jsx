@@ -1,16 +1,22 @@
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 
 import { useAuth } from "../context/AuthContext";
 import { useClients } from "../context/ClientsContext";
 import { getAge } from "../utils/date";
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const { token, logout, user } = useAuth();
   const { advisors } = useClients();
 
   const userAge = user ? getAge(user.dob) : null;
   const isAdvisor = user ? user.role === "advisor" : false;
   const isClient = user ? user.role === "client" : false;
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <header
@@ -60,27 +66,36 @@ export default function Navbar() {
       <nav>
         {token ? (
           user ? (
-            <div className="flex flex-row justify-start items-center space-x-4">
-              <div>
-                <p>
+            <div className="flex flex-row items-center justify-end gap-6">
+              <div className="text-right">
+                <p className="font-medium">
                   {user.firstName} {user.lastName} ({user.role})
-                  {userAge !== null ? `, Age ${userAge}` : ""}
+                  {isClient && userAge !== null ? `, Age ${userAge}` : ""}
                 </p>
                 {advisors && advisors.length > 0 && (
-                  <p className="text-sm text-gray-600 mb-4">
+                  <p className="text-sm text-gray-300">
                     Advisor: {advisors[0].firstName} {advisors[0].lastName}
                   </p>
                 )}
               </div>
-              <NavLink to="/" onClick={logout}>
+
+              <button
+                onClick={handleLogout}
+                className=" bg-white text-gray-800 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+              >
                 Log out
-              </NavLink>
+              </button>
             </div>
           ) : (
             <p>Loading profile...</p>
           )
         ) : (
-          <NavLink to="/login">Log in</NavLink>
+          <NavLink
+            to="/login"
+            className="bg-white text-gray-800 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+          >
+            Log in
+          </NavLink>
         )}
       </nav>
     </header>

@@ -4,7 +4,9 @@ export default function Cash() {
   const { investments } = useClients();
   return (
     <section>
-      <p className="bg-gray-300">Cash: </p>
+      <p className="text-xs font-medium uppercase tracking-widest text-gray-500">
+        Cash:{" "}
+      </p>
       <p className="text-blue-900 text-xl font-bold ">
         $
         {investments

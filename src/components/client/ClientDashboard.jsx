@@ -12,6 +12,7 @@ import {
   PieSeriesModule,
   LegendModule,
 } from "ag-charts-community";
+import { getAge } from "../../utils/date";
 
 ModuleRegistry.registerModules([PieSeriesModule, LegendModule]);
 
@@ -34,6 +35,7 @@ export default function ClientDashboard() {
 
   const isAdvisor = user?.role === "advisor";
   const isClient = user?.role === "client";
+  const clientAge = client ? getAge(client.dob) : null;
 
   const totalValue = investments.reduce(
     (acc, investment) => acc + investment.quantity * investment.unit_price,
@@ -61,6 +63,17 @@ export default function ClientDashboard() {
         type: "pie",
         angleKey: "amount",
         legendItemKey: "asset",
+        fills: [
+          "#004D40", // darkest teal
+          "#00695C",
+          "#00897B",
+          "#26A69A",
+          "#4DB6AC",
+          "#80CBC4",
+          "#B2DFDB", // lightest teal
+        ],
+        strokes: ["#ffffff"],
+        strokeWidth: 1,
       },
     ],
   };
@@ -89,7 +102,7 @@ export default function ClientDashboard() {
       {isAdvisor ? (
         <>
           <h1 className="text-2xl font-bold mb-4">
-            {client?.firstName} {client?.lastName} Dashboard
+            {client?.firstName} {client?.lastName}, Age {clientAge}
           </h1>
         </>
       ) : (
@@ -101,14 +114,16 @@ export default function ClientDashboard() {
         <p>You have no investments yet.</p>
       ) : (
         <div className="grid grid-cols-2 gap-4">
-          <section className="space-y-4">
-            <p className="bg-gray-300">Total value: </p>
+          <section className="space-y-4 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+            <p className="text-xs font-medium uppercase tracking-widest text-gray-500">
+              Total value:{" "}
+            </p>
             <p className="text-blue-900 text-3xl font-bold ">
               ${totalValue.toFixed(2)}
             </p>
           </section>
           <Goals />
-          <div className="col-span-1 space-y-4">
+          <div className="col-span-1 space-y-4 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
             <Investments
               isAdvisor={isAdvisor}
               handleQuantityChange={handleQuantityChange}
@@ -116,7 +131,7 @@ export default function ClientDashboard() {
             {isAdvisor && (
               <section className="col-span-1">
                 <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  className="bg-blue-950 text-white px-4 py-2 rounded"
                   onClick={() => setIsAddInvestmentOpen(true)}
                 >
                   Add Investment
@@ -125,8 +140,10 @@ export default function ClientDashboard() {
             )}
             <Cash />
           </div>
-          <section className="col-span-1">
-            <p className="bg-gray-300">Chart: </p>
+          <section className="col-span-1 bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+            <p className="text-xs font-medium uppercase tracking-widest text-gray-500">
+              Chart:
+            </p>
             <AgCharts options={options} />
           </section>
           <Recommendations />
