@@ -1,37 +1,21 @@
 import { useAuth } from "../../context/AuthContext";
 import { useClients } from "../../context/ClientsContext";
+import {
+  deleteRecommendation,
+  updateRecommendationStatus,
+} from "../../../api/wealthwise";
 
-export default function Recommendation({ rec }) {
-  const { user, token } = useAuth();
+export default function Recommendation({ rec, isAdvisor, isClient }) {
+  const { token } = useAuth();
   const { recommendations, setRecommendations } = useClients();
-  const isClient = user?.role === "client";
-  const isAdvisor = user?.role === "advisor";
-  const statusClass =
-    rec.status === "pending"
-      ? "bg-yellow-200"
-      : rec.status === "rejected"
-        ? "bg-red-200"
-        : "bg-green-200";
 
   const onAcceptRec = async (recId) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API}/recommendations/${recId}/status`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status: "accepted" }),
-        },
+      const updatedRec = await updateRecommendationStatus(
+        recId,
+        token,
+        "accepted",
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to accept recommendation");
-      }
-
-      const updatedRec = await response.json();
       const updatedRecommendations = recommendations.map((rec) =>
         rec.id === recId ? { ...rec, ...updatedRec } : rec,
       );
@@ -43,23 +27,11 @@ export default function Recommendation({ rec }) {
 
   const onRejectRec = async (recId) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API}/recommendations/${recId}/status`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ status: "rejected" }),
-        },
+      const updatedRec = await updateRecommendationStatus(
+        recId,
+        token,
+        "rejected",
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to reject recommendation");
-      }
-
-      const updatedRec = await response.json();
       const updatedRecommendations = recommendations.map((rec) =>
         rec.id === recId ? { ...rec, ...updatedRec } : rec,
       );
@@ -71,20 +43,7 @@ export default function Recommendation({ rec }) {
 
   const onDeleteRec = async (recId) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API}/recommendations/${recId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete recommendation");
-      }
+      await deleteRecommendation(recId, token);
 
       const updatedRecommendations = recommendations.filter(
         (rec) => rec.id !== recId,
@@ -95,40 +54,60 @@ export default function Recommendation({ rec }) {
     }
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "accepted":
+        return "bg-green-100 text-green-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
   return (
-    <table className="w-full my-2">
-      <tbody>
-        <tr className="flex flex-row justify-between items-center mx-2">
-          <td>{rec.content}</td>
-          <td className={`${statusClass} text-center w-18`}>{rec.status}</td>
+    <tr className="border-b border-gray-100 hover:bg-gray-50/60 transition-colors">
+      <td className="py-4 pr-4">
+        <strong className="font-medium text-slate-900">{rec.content}</strong>
+      </td>
+      <td className="py-4 pr-4">
+        <span
+          className={`text-xs font-medium px-3 py-1 rounded-full ${getStatusColor(rec.status)}`}
+        >
+          {rec.status.charAt(0).toUpperCase() + rec.status.slice(1)}
+        </span>
+      </td>
+      <td className="py-4 pr-4 text-sm text-gray-600">{rec.note || "—"}</td>
+      <td className="py-4 pr-4">
+        <div className="flex space-x-2">
           {isClient && (
-            <td className="flex space-x-2">
+            <>
               <button
                 onClick={() => onAcceptRec(rec.id)}
-                className="text-lg text-gray-500 hover:bg-gray-300 border border-gray-300 rounded w-fit px-4 py-2"
+                className="bg-green-600 text-white px-3 py-1.5 rounded text-sm font-medium hover:bg-green-700 transition-colors"
               >
                 Accept
               </button>
               <button
                 onClick={() => onRejectRec(rec.id)}
-                className="text-lg text-gray-500 hover:bg-gray-300 border border-gray-300 rounded w-fit px-4 py-2"
+                className="bg-red-600 text-white px-3 py-1.5 rounded text-sm font-medium hover:bg-red-700 transition-colors"
               >
                 Reject
               </button>
-            </td>
+            </>
           )}
           {isAdvisor && (
-            <td className="flex space-x-2">
-              <button
-                onClick={() => onDeleteRec(rec.id)}
-                className="text-lg text-gray-500 hover:bg-gray-300 border border-gray-300 rounded w-fit px-4 py-2"
-              >
-                Delete
-              </button>
-            </td>
+            <button
+              onClick={() => onDeleteRec(rec.id)}
+              className="bg-red-600 text-white px-3 py-1.5 rounded text-sm font-medium hover:bg-red-700 transition-colors"
+            >
+              Delete
+            </button>
           )}
-        </tr>
-      </tbody>
-    </table>
+        </div>
+      </td>
+    </tr>
   );
 }

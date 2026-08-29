@@ -1,8 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-
-const API = import.meta.env.VITE_API;
+import { getAdvisorClients } from "../../../api/wealthwise";
 
 export default function AdvisorDashboard() {
   const navigate = useNavigate();
@@ -15,17 +14,7 @@ export default function AdvisorDashboard() {
 
     async function loadClients() {
       try {
-        const response = await fetch(`${API}/clients`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to load clients");
-        }
-
-        const data = await response.json();
+        const data = await getAdvisorClients(token);
         setClients(data);
       } catch (error) {
         console.error(error);
@@ -39,43 +28,56 @@ export default function AdvisorDashboard() {
   return (
     <div>
       <h2 className="text-xl font-bold mb-4 text-blue-900 ">My clients</h2>
-      <table className="w-full border border-gray-300">
-        <thead className="bg-gray-300">
-          <tr>
-            <th className="text-left border border-gray-300 px-4 py-2">Name</th>
-            <th className="text-left border border-gray-300 px-4 py-2">
-              Portfolio Value
-            </th>
-            <th className="text-left border border-gray-300 px-4 py-2">
-              Goals
-            </th>
-            <th className="text-left border border-gray-300 px-4 py-2">
-              Pending Recommendations
-            </th>
-            <th className="text-left border border-gray-300 px-4 py-2"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {clients.map((client) => (
-            <tr key={client.id}>
-              <td className=" px-4 py-2">
-                {client.firstName} {client.lastName}
-              </td>
-              <td className="px-4 py-2">{client.portfolioValue}</td>
-              <td className="px-4 py-2">0</td>
-              <td className="px-4 py-2">0</td>
-              <td className="px-4 py-2">
-                <button
-                  onClick={() => navigate(`/clients/${client.id}/investments`)}
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                  View Client
-                </button>
-              </td>
+      <div className="overflow-x-auto bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b border-gray-200">
+              <th className="text-left text-xs font-medium uppercase tracking-widest text-gray-500 pb-3 pr-4">
+                Name
+              </th>
+              <th className="text-left text-xs font-medium uppercase tracking-widest text-gray-500 pb-3 pr-4">
+                Portfolio Value
+              </th>
+              <th className="text-left text-xs font-medium uppercase tracking-widest text-gray-500 pb-3 pr-4">
+                Goals
+              </th>
+              <th className="text-left text-xs font-medium uppercase tracking-widest text-gray-500 pb-3 pr-4">
+                Pending Recommendations
+              </th>
+              <th className="text-left text-xs font-medium uppercase tracking-widest text-gray-500 pb-3"></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {clients.map((client) => (
+              <tr
+                key={client.id}
+                className="border-b border-gray-100 hover:bg-gray-50/60 transition-colors"
+              >
+                <td className="py-4 pr-4">
+                  <strong className="font-medium text-slate-900">
+                    {client.firstName} {client.lastName}
+                  </strong>
+                </td>
+                <td className="py-4 pr-4 text-sm text-gray-600">
+                  ${client.portfolioValue}
+                </td>
+                <td className="py-4 pr-4 text-sm text-gray-600">0</td>
+                <td className="py-4 pr-4 text-sm text-gray-600">0</td>
+                <td className="py-4 pr-4">
+                  <button
+                    onClick={() =>
+                      navigate(`/clients/${client.id}/investments`)
+                    }
+                    className="bg-blue-950 text-white px-4 py-2 rounded hover:bg-blue-900 transition-colors"
+                  >
+                    View Client
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
