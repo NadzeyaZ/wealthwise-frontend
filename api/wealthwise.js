@@ -122,6 +122,23 @@ export async function deleteRecommendation(recId, token) {
   }
 }
 
+export async function generateAIRecommendation(token, { clientId, goalId }) {
+  const response = await fetch(`${API}/recommendations/generate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ clientId, goalId }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to generate AI recommendation");
+  }
+
+  return response.json(); // { draft }
+}
+
 // client
 export async function getClientAdvisors(clientId, token) {
   const response = await fetch(`${API}/clients/${clientId}/advisor`, {
